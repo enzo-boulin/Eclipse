@@ -186,31 +186,7 @@ class RTEClient:
 
         return resp
 
-    # ---------- convenience: SOAP helper ----------
-    def soap_request(
-        self,
-        endpoint: str,
-        soap_xml: str,
-        action: Optional[str] = None,
-        *,
-        params: Optional[Dict[str, str]] = None,
-    ) -> requests.Response:
-        """
-        Sends a SOAP request. RTE expects:
-        Content-Type: application/soap+xml;charset=UTF-8; action="..."
-        You can optionally pass a SOAP action name; if not provided, it will set the content type without action.
-        """
-        ct = "application/soap+xml;charset=UTF-8"
-        if action:
-            # action in content-type parameter, per document example
-            ct = f'{ct}; action="{action}"'
-        headers = {
-            "Content-Type": ct,
-        }
-        return self.request(
-            endpoint, method="POST", headers=headers, data=soap_xml, params=params
-        )
-
+    # ---------- API methods ----------
     def get_france_power_exchanges(self) -> pd.DataFrame:
         resp = self.request(config.WHOLESALE_MARKET_ENDPOINT, method="GET")
         resp.raise_for_status()
