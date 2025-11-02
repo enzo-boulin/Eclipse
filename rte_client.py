@@ -198,9 +198,6 @@ class RTEClient:
             if not values:
                 continue
             df = pd.DataFrame(values)
-            df["start_date_day"] = entry.get("start_date")
-            df["end_date_day"] = entry.get("end_date")
-            df["updated_date"] = entry.get("updated_date")
             frames.append(df)
 
         if not frames:
@@ -209,7 +206,6 @@ class RTEClient:
         df = pd.concat(frames, ignore_index=True)
         df["start_date"] = pd.to_datetime(df["start_date"])
         df["end_date"] = pd.to_datetime(df["end_date"])
-        df["updated_date"] = pd.to_datetime(df["updated_date"])
         df["value"] = pd.to_numeric(df["value"], errors="coerce")
         df["price"] = pd.to_numeric(df["price"], errors="coerce")
         return df
@@ -259,7 +255,6 @@ class RTEClient:
         for col in [
             "start_date",
             "end_date",
-            "updated_date",
         ]:
             if col in df:
                 df[col] = pd.to_datetime(df[col], errors="coerce")
