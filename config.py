@@ -15,22 +15,22 @@ CONSUMPTION_ENDPOINT = "open_api/consumption/v1/short_term"
 TOKEN_ENDPOINT = "token/oauth/"
 
 
-class APIName(str, Enum):
+class APIService(str, Enum):
     wholesale_market = "wholesale_market"
     consumption = "consumption"
 
 
 API_TO_CREDENTIALS = {
-    APIName.wholesale_market: (
+    APIService.wholesale_market: (
         RTE_WHOLESALE_MARKET_CLIENT_ID,
         RTE_WHOLESALE_MARKET_CLIENT_SECRET,
     ),
-    APIName.consumption: (RTE_CONSUMPTION_CLIENT_ID, RTE_CONSUMPTION_CLIENT_SECRET),
+    APIService.consumption: (RTE_CONSUMPTION_CLIENT_ID, RTE_CONSUMPTION_CLIENT_SECRET),
 }
 
-ENDPOINT_TO_API = {
-    WHOLESALE_MARKET_ENDPOINT: APIName.wholesale_market,
-    CONSUMPTION_ENDPOINT: APIName.consumption,
+API_TO_ENDPOINT = {
+    APIService.wholesale_market: WHOLESALE_MARKET_ENDPOINT,
+    APIService.consumption: CONSUMPTION_ENDPOINT,
 }
 
 
