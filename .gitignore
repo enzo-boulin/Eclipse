@@ -1,0 +1,62 @@
+# === Python cache files ===
+__pycache__/
+*.py[cod]
+*$py.class
+
+# === Virtual environments ===
+.venv/
+venv/
+env/
+ENV/
+
+# === Editor & IDE files ===
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# === OS files ===
+.DS_Store
+Thumbs.db
+
+# === Testing & coverage ===
+.coverage
+.coverage.*
+.cache/
+htmlcov/
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+
+# === Build & packaging ===
+build/
+dist/
+*.egg-info/
+.eggs/
+pip-wheel-metadata/
+
+# === Logs & debug ===
+*.log
+
+# === Jupyter notebooks ===
+.ipynb_checkpoints/
+
+# === MyPy & typing caches ===
+.mypy_cache/
+.dmypy.json
+.pyre/
+.pytype/
+
+# === Pytest & VCR ===
+.vcr_cassettes/
+pytest_cache/
+
+# === Environment variables / local configs ===
+.env
+.env.*
+
+# === Temporary files ===
+*.tmp
+*.temp
+*.bak
