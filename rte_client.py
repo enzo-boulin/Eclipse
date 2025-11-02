@@ -235,8 +235,8 @@ class RTEClient:
     def get_short_term_consumptions(
         self,
         types: PrevisionType | list[PrevisionType] | None = None,
-        start_date: pd.Timestamp | None = None,
-        end_date: pd.Timestamp | None = None,
+        start: pd.Timestamp | None = None,
+        end: pd.Timestamp | None = None,
     ) -> dict[PrevisionType, pd.Series]:
         """
         Renvoie la consommation réalisée ou prévue en France.
@@ -248,10 +248,10 @@ class RTEClient:
                 params["type"] = ",".join(types)
             else:
                 params["type"] = types
-        if start_date:
-            params["start_date"] = start_date
-        if end_date:
-            params["end_date"] = end_date
+        if start:
+            params["start_date"] = start
+        if end:
+            params["end_date"] = end
 
         resp = self.request(config.CONSUMPTION_ENDPOINT, method="GET", params=params)
         resp.raise_for_status()
@@ -266,9 +266,20 @@ class RTEClient:
             if not values:
                 continue
 
-            previsions[prevision_type] = _rte_data_cleaning(values)
+            previsions[prevision_type] = _rte_data_cleaning(
+                values, start=start, end=end
+            )
 
         return previsions
+
+    def get_realised_consumption(
+        self, start: pd.Timestamp, end: pd.Timestamp
+    ) -> pd.Series:
+        prevision = self.get_short_term_consumptions(
+            types=PrevisionType.REALISED, start=start, end=end
+        )
+        df = prevision.get(PrevisionType.REALISED, pd.DataFrame())
+        return df.squeeze()
 
 
 # -------------------- Exemple d'utilisation --------------------

@@ -1,5 +1,6 @@
 import json
 
+import pandas as pd
 import requests
 from inline_snapshot import snapshot
 
@@ -94,7 +95,7 @@ def test_get_france_power_exchanges(monkeypatch):
 
 def test_get_short_term_consumptions(monkeypatch):
     monkeypatch.setattr("requests.post", fake_post)
-    monkeypatch.setattr("requests.request", fake_request("tests/consumption.json"))
+    monkeypatch.setattr("requests.request", fake_request("tests/consumptions.json"))
 
     client = RTEClient("id", "secret")
     consumptions = client.get_short_term_consumptions()
@@ -114,4 +115,48 @@ def test_get_short_term_consumptions(monkeypatch):
 2025-10-01 00:30:00+02:00  42200.0
 2025-10-01 00:45:00+02:00      NaN
 2025-10-01 01:00:00+02:00  40300.0\
+""")
+
+
+def test_get_short_term_ID_consumption(monkeypatch):
+    monkeypatch.setattr("requests.post", fake_post)
+    monkeypatch.setattr("requests.request", fake_request("tests/ID.json"))
+
+    client = RTEClient("id", "secret")
+    consumptions = client.get_short_term_consumptions(
+        types=PrevisionType.ID, end=pd.Timestamp("2025-10-01T01:37:00+02:00")
+    )
+    assert str(consumptions[PrevisionType.ID]) == snapshot("""\
+                             value
+2025-10-01 00:00:00+02:00  44000.0
+2025-10-01 00:15:00+02:00  43800.0
+2025-10-01 00:30:00+02:00  42200.0
+2025-10-01 00:45:00+02:00      NaN
+2025-10-01 01:00:00+02:00  40300.0
+2025-10-01 01:15:00+02:00      NaN
+2025-10-01 01:30:00+02:00      NaN
+2025-10-01 01:45:00+02:00      NaN\
+""")
+
+
+def test_get_realised_consumption(monkeypatch):
+    monkeypatch.setattr("requests.post", fake_post)
+    monkeypatch.setattr("requests.request", fake_request("tests/consumption.json"))
+
+    client = RTEClient("id", "secret")
+    ts = client.get_realised_consumption(
+        start=pd.Timestamp("2025-10-01T00:00:00+02:00"),
+        end=pd.Timestamp("2025-10-01T01:37:00+02:00"),
+    )
+    assert isinstance(ts, pd.Series)
+    assert str(ts) == snapshot("""\
+2025-10-01 00:00:00+02:00    44345.0
+2025-10-01 00:15:00+02:00    44174.0
+2025-10-01 00:30:00+02:00    43040.0
+2025-10-01 00:45:00+02:00    41806.0
+2025-10-01 01:00:00+02:00        NaN
+2025-10-01 01:15:00+02:00    41060.0
+2025-10-01 01:30:00+02:00        NaN
+2025-10-01 01:45:00+02:00        NaN
+Freq: 15min, Name: value, dtype: float64\
 """)
