@@ -80,7 +80,7 @@ def test_get_france_power_exchanges(monkeypatch):
     monkeypatch.setattr("requests.post", fake_post)
     monkeypatch.setattr("requests.request", fake_request("tests/power_exchanges.json"))
 
-    client = RTEClient()
+    client = RTEClient(use_cache_file=False)
     df = client.get_france_power_exchanges()
     assert str(df) == snapshot("""\
                              value  price
@@ -97,7 +97,7 @@ def test_get_short_term_consumptions(monkeypatch):
     monkeypatch.setattr("requests.post", fake_post)
     monkeypatch.setattr("requests.request", fake_request("tests/consumptions.json"))
 
-    client = RTEClient()
+    client = RTEClient(use_cache_file=False)
     consumptions = client.get_short_term_consumptions()
     assert str(consumptions[PrevisionType.REALISED]) == snapshot("""\
                            value
@@ -122,7 +122,7 @@ def test_get_short_term_ID_consumption(monkeypatch):
     monkeypatch.setattr("requests.post", fake_post)
     monkeypatch.setattr("requests.request", fake_request("tests/ID.json"))
 
-    client = RTEClient()
+    client = RTEClient(use_cache_file=False)
     consumptions = client.get_short_term_consumptions(
         types=PrevisionType.ID, end=pd.Timestamp("2025-10-01T01:37:00+02:00")
     )
@@ -143,7 +143,7 @@ def test_get_realised_consumption(monkeypatch):
     monkeypatch.setattr("requests.post", fake_post)
     monkeypatch.setattr("requests.request", fake_request("tests/consumption.json"))
 
-    client = RTEClient()
+    client = RTEClient(use_cache_file=False)
     ts = client.get_realised_consumption(
         start=pd.Timestamp("2025-10-01T00:00:00+02:00"),
         end=pd.Timestamp("2025-10-01T01:37:00+02:00"),

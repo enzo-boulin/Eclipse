@@ -142,6 +142,7 @@ class RTEClient:
         token_endpoint: str = config.TOKEN_ENDPOINT,
         api_base: str = config.RTE_BASE_URL,
         timeout: int = 10,
+        use_cache_file: bool = True,
     ):
         self.api_base = api_base.rstrip("/") + "/"
         self.token_url = self.api_base + token_endpoint.rstrip("/") + "/"
@@ -151,12 +152,14 @@ class RTEClient:
         for service in api_services:
             client_id, client_secret = config.API_TO_CREDENTIALS[service]
             self.services[service] = {
-                "url": api_base + config.API_TO_ENDPOINT[service].rstrip("/") + "/",
+                "url": api_base + config.API_TO_ENDPOINT[service].rstrip("/"),
                 "token_manager": TokenManager(
                     client_id,
                     client_secret,
                     self.token_url,
-                    cache_file=f"token/{service}_token_cache.json",
+                    cache_file=f"token/{service}_token_cache.json"
+                    if use_cache_file
+                    else None,
                 ),
             }
 
@@ -252,9 +255,9 @@ class RTEClient:
             else:
                 params["type"] = types
         if start:
-            params["start_date"] = start
+            params["start_date"] = start.isoformat()
         if end:
-            params["end_date"] = end
+            params["end_date"] = end.isoformat()
 
         resp = self.request(APIService.consumption, method="GET", params=params)
         resp.raise_for_status()
@@ -293,10 +296,10 @@ if __name__ == "__main__":
     consumptions = client.get_short_term_consumptions()
     print(consumptions)
 
-    df = client.get_short_term_consumptions(
+    consumptions = client.get_short_term_consumptions(
         types=["REALISED", "ID"],
-        start_date="2025-10-01T00:00:00+02:00",
-        end_date="2025-10-02T00:00:00+02:00",
+        start=pd.Timestamp("2025-10-01T00:00:00+02:00"),
+        end=pd.Timestamp("2025-10-02T00:00:00+02:00"),
     )
     print(consumptions)
 
