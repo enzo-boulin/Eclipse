@@ -16,6 +16,37 @@ import config
 from config import PrevisionType
 
 
+def _rte_data_cleaning(
+    values: dict[str, Any],
+    *,
+    start: pd.Timestamp | None = None,
+    end: pd.Timestamp | None = None,
+    columns: list[str] = ["value"],
+) -> pd.DataFrame:
+    """
+    Cleans the API response and
+    Returns a Series with 15min frequency
+    """
+    df = pd.DataFrame(values, columns=["start_date", *columns])
+    df["start_date"] = pd.to_datetime(df["start_date"], errors="coerce")
+    for col in columns:
+        df[col] = pd.to_numeric(df[col], errors="coerce")
+    df = df.sort_values("start_date").drop_duplicates(subset="start_date")
+    df = df.set_index("start_date", verify_integrity=True)
+
+    # Determine date range boundaries (rounded to nearest 15T)
+    freq = "15min"
+    start = (start or df.index.min()).floor(freq)
+    end = (end or df.index.max()).ceil(freq)
+
+    # Build uniform 15-minute index, missing values are filled with nan
+    expected_index = pd.date_range(start=start, end=end, freq=freq)
+
+    df = df.reindex(expected_index)
+
+    return df
+
+
 class RTEAuthError(Exception):
     pass
 
@@ -191,31 +222,22 @@ class RTEClient:
         resp = self.request(config.WHOLESALE_MARKET_ENDPOINT, method="GET")
         resp.raise_for_status()
         data = resp.json().get("france_power_exchanges", [])
-
-        frames = []
+        total_values = []
         for entry in data:
             values = entry.get("values", [])
             if not values:
                 continue
-            df = pd.DataFrame(values)
-            frames.append(df)
+            total_values += values
 
-        if not frames:
-            return pd.DataFrame()
-
-        df = pd.concat(frames, ignore_index=True)
-        df["start_date"] = pd.to_datetime(df["start_date"])
-        df["end_date"] = pd.to_datetime(df["end_date"])
-        df["value"] = pd.to_numeric(df["value"], errors="coerce")
-        df["price"] = pd.to_numeric(df["price"], errors="coerce")
+        df = _rte_data_cleaning(total_values, columns=["value", "price"])
         return df
 
-    def get_short_term_consumption(
+    def get_short_term_consumptions(
         self,
         types: PrevisionType | list[PrevisionType] | None = None,
         start_date: pd.Timestamp | None = None,
         end_date: pd.Timestamp | None = None,
-    ) -> pd.DataFrame:
+    ) -> dict[PrevisionType, pd.Series]:
         """
         Renvoie la consommation réalisée ou prévue en France.
         """
@@ -234,35 +256,19 @@ class RTEClient:
         resp = self.request(config.CONSUMPTION_ENDPOINT, method="GET", params=params)
         resp.raise_for_status()
         data = resp.json().get("short_term", [])
-
         if not data:
-            return pd.DataFrame()
+            return {}
 
-        frames = []
-        for entry in data:
-            values = entry.get("values", [])
+        previsions = {}
+        for prevision in data:
+            prevision_type = PrevisionType(prevision.get("type"))
+            values = prevision.get("values", [])
             if not values:
                 continue
-            df = pd.DataFrame(values)
-            df["type"] = entry.get("type")
-            frames.append(df)
 
-        if not frames:
-            return pd.DataFrame()
+            previsions[prevision_type] = _rte_data_cleaning(values)
 
-        df = pd.concat(frames, ignore_index=True)
-
-        for col in [
-            "start_date",
-            "end_date",
-        ]:
-            if col in df:
-                df[col] = pd.to_datetime(df[col], errors="coerce")
-        if "value" in df:
-            df["value"] = pd.to_numeric(df["value"], errors="coerce")
-
-        df = df.sort_values(["type", "start_date"]).reset_index(drop=True)
-        return df
+        return previsions
 
 
 # -------------------- Exemple d'utilisation --------------------
@@ -277,16 +283,16 @@ if __name__ == "__main__":
     )
 
     # Exemple 1 : récupération automatique (les prévisions les plus à jour)
-    df = client.get_short_term_consumption()
-    print(df.head())
+    consumptions = client.get_short_term_consumptions()
+    print(consumptions)
 
     # Exemple 2 : récupération d’une période précise
-    df = client.get_short_term_consumption(
+    df = client.get_short_term_consumptions(
         types=["REALISED", "ID"],
         start_date="2025-10-01T00:00:00+02:00",
         end_date="2025-10-02T00:00:00+02:00",
     )
-    print(df.head())
+    print(consumptions)
 
     client = RTEClient(
         client_id=config.RTE_WHOLESALE_MARKET_CLIENT_ID,
