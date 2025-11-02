@@ -7,7 +7,7 @@ https://data.rte-france.org/documents/20182/22648/EN_GuideOauth2_v5.1.pdf/54d3d1
 import base64
 import json
 import time
-from typing import Any, Dict, Optional
+from typing import Any, Dict
 
 import pandas as pd
 import requests
@@ -27,7 +27,7 @@ class RTEClient:
         client_secret: str,
         token_endpoint: str = config.TOKEN_ENDPOINT,
         api_base: str = config.RTE_BASE_URL,
-        token_cache_file: Optional[str] = None,
+        token_cache_file: str | None = None,
         timeout: int = 10,
     ):
         self.client_id = client_id
@@ -37,7 +37,7 @@ class RTEClient:
         self.timeout = timeout
 
         # token state
-        self._access_token: Optional[str] = None
+        self._access_token: str | None = None
         self._token_expiry: float = 0.0
         self._token_cache_file = token_cache_file
 
@@ -131,9 +131,9 @@ class RTEClient:
         endpoint: str,
         *,
         method: str = "POST",
-        headers: Optional[Dict[str, str]] = None,
-        params: Optional[Dict[str, str]] = None,
-        data: Optional[Any] = None,
+        headers: Dict[str, str] | None = None,
+        params: Dict[str, str] | None = None,
+        data: Any = None,
         force_token_refresh_on_401: bool = True,
     ) -> requests.Response:
         """
