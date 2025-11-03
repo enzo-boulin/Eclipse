@@ -15,6 +15,8 @@ import requests
 import config
 from config import APIService, PrevisionType
 
+FREQ = "15min"
+
 
 def _rte_data_cleaning(
     values: dict[str, Any],
@@ -28,23 +30,24 @@ def _rte_data_cleaning(
     Returns a Series with 15min frequency
     """
     df = pd.DataFrame(values, columns=["start_date", *columns])
-    df["start_date"] = pd.to_datetime(df["start_date"], errors="coerce")
+    df["start_date"] = pd.to_datetime(df["start_date"], errors="coerce").dt.tz_convert(
+        "CET"
+    )
     for col in columns:
         df[col] = pd.to_numeric(df[col], errors="coerce")
     df = df.sort_values("start_date").drop_duplicates(subset="start_date")
     df = df.set_index("start_date", verify_integrity=True)
 
-    # Determine date range boundaries (rounded to nearest 15T)
-    freq = "15min"
-    start = (start or df.index.min()).floor(freq)
-    end = (end or df.index.max()).ceil(freq)
+    # Ensure dates are rounded (they should already be)
+    rounded_start = (start or df.index.min()).floor(FREQ)
+    rounded_end = (end or df.index.max()).floor(FREQ)
 
     # Build uniform 15-minute index, missing values are filled with nan
-    expected_index = pd.date_range(start=start, end=end, freq=freq)
+    expected_index = pd.date_range(start=rounded_start, end=rounded_end, freq=FREQ)
 
-    df = df.reindex(expected_index)
+    df_with_freq = df.reindex(expected_index)
 
-    return df
+    return df_with_freq
 
 
 class TokenManager:
@@ -245,19 +248,21 @@ class RTEClient:
         end: pd.Timestamp | None = None,
     ) -> dict[PrevisionType, pd.Series]:
         """
-        Renvoie la consommation réalisée ou prévue en France.
+        French realised load data (15Mmin)
+        RTE only sends data for the whole day so we have to cut ourself.
         """
-
         params = {}
         if types:
             if isinstance(types, list):
                 params["type"] = ",".join(types)
             else:
                 params["type"] = types
+
+        # I dont know why but RTE returns 15 min before the wanted end date so we can fix this by adding 15 min
         if start:
-            params["start_date"] = start.isoformat()
+            params["start_date"] = start.floor("1D").isoformat()
         if end:
-            params["end_date"] = end.isoformat()
+            params["end_date"] = end.ceil("1D").isoformat()
 
         resp = self.request(APIService.consumption, method="GET", params=params)
         resp.raise_for_status()
@@ -272,8 +277,11 @@ class RTEClient:
             if not values:
                 continue
 
+            # We floor the end date because the last index is the end of the last period minus 15min
             previsions[prevision_type] = _rte_data_cleaning(
-                values, start=start, end=end
+                values,
+                start=start.floor(FREQ),
+                end=end.ceil(FREQ) - pd.DateOffset(minutes=15),
             )
 
         return previsions
@@ -285,6 +293,7 @@ class RTEClient:
             types=PrevisionType.REALISED, start=start, end=end
         )
         df = prevision.get(PrevisionType.REALISED, pd.DataFrame())
+
         return df.squeeze()
 
 
@@ -293,15 +302,19 @@ class RTEClient:
 if __name__ == "__main__":
     client = RTEClient()
 
-    consumptions = client.get_short_term_consumptions()
-    print(consumptions)
+    # consumptions = client.get_short_term_consumptions()
+    # print(consumptions)
 
-    consumptions = client.get_short_term_consumptions(
-        types=["REALISED", "ID"],
-        start=pd.Timestamp("2025-10-01T00:00:00+02:00"),
-        end=pd.Timestamp("2025-10-02T00:00:00+02:00"),
-    )
-    print(consumptions)
+    # consumptions = client.get_short_term_consumptions(
+    #     types=["REALISED", "ID"],
+    #     start=pd.Timestamp("2025-10-01T00:00:00+02:00"),
+    #     end=pd.Timestamp("2025-10-02T00:00:00+02:00"),
+    # )
+    # print(consumptions)
 
-    df = client.get_france_power_exchanges()
-    print(df.head())
+    # df = client.get_france_power_exchanges()
+    # print(df.head())
+    start = pd.Timestamp("2020-01-01", tz="CET")
+    end = pd.Timestamp("2020-01-31", tz="CET") + pd.DateOffset(months=11)
+    ts = client.get_realised_consumption(start, end)
+    ts.to_csv("consumption_backup.csv")

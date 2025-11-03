@@ -42,40 +42,6 @@ def fake_request(json_file: str):
     return fn
 
 
-# def test_basic_auth_header():
-#     client = RTEClient("myid", "mysecret", token_cache_file=None)
-#     header = client._basic_auth_header()
-#     assert header.startswith("Basic ")
-
-#     payload = header.split(" ", 1)[1]
-#     assert base64.b64decode(payload.encode()).decode() == "myid:mysecret"
-
-
-# def test_get_access_token_success(monkeypatch, tmp_path):
-#     called = {}
-
-#     def fake_post(url, headers, data, timeout):
-#         called["url"] = url
-#         return DummyResponse(
-#             200,
-#             body={
-#                 "access_token": "tok-123",
-#                 "token_type": "Bearer",
-#                 "expires_in": 3600,
-#             },
-#         )
-
-#     monkeypatch.setattr("requests.post", fake_post)
-
-#     cache_file = tmp_path / "token_cache.json"
-#     client = RTEClient("id", "secret", token_cache_file=str(cache_file))
-#     token = client.get_access_token()
-#     assert token == "tok-123"
-#     # token saved to cache file
-#     data = json.loads(cache_file.read_text())
-#     assert data["access_token"] == "tok-123"
-
-
 def test_get_france_power_exchanges(monkeypatch):
     monkeypatch.setattr("requests.post", fake_post)
     monkeypatch.setattr("requests.request", fake_request("tests/power_exchanges.json"))
