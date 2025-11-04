@@ -1,0 +1,84 @@
+import pandas as pd
+
+
+def format_ts(
+    ts: pd.Series,
+    start: pd.Timestamp,
+    end: pd.Timestamp,
+    ts_tz: str | None = None,
+    freq: str = "1h",
+    include_end: bool = False,
+) -> pd.Series:
+    """
+    Format a timeseries to have:
+    - hourly (or custom) frequency between start and end
+    - UTC timezone
+    - missing values filled with NaN
+    - index floored/ceiled to full hour boundaries
+
+    Parameters
+    ----------
+    ts : pd.Series
+        Input timeseries with a datetime-like index.
+    start : pd.Timestamp
+        Start time (tz-aware).
+    end : pd.Timestamp
+        End time (tz-aware).
+    ts_tz : str | None, optional
+        Timezone of ts if its index is tz-naive. Required if index is tz-naive.
+    freq : str, optional
+        Frequency for reindexing (default "1h").
+
+    Returns
+    -------
+    pd.Series
+        Formatted timeseries with UTC timezone and given frequency.
+
+    Raises
+    ------
+    ValueError
+        If start or end are not tz-aware.
+        If ts index is tz-naive and ts_tz is None.
+        If reindexing fails.
+    """
+
+    # --- Validate timezone awareness
+    if start.tzinfo is None or end.tzinfo is None:
+        raise ValueError("Both `start` and `end` must be timezone-aware Timestamps.")
+
+    if not isinstance(ts.index, pd.DatetimeIndex):
+        raise ValueError("`ts` must have a DatetimeIndex.")
+
+    # --- Handle timezone of ts
+    idx = ts.index
+    if idx.tz is None:
+        if ts_tz is None:
+            raise ValueError("`ts` index is tz-naive and `ts_tz` was not provided.")
+        idx = idx.tz_localize(ts_tz)
+    ts = ts.copy()
+    ts.index = idx
+
+    # --- Convert to UTC
+    ts = ts.tz_convert("UTC")
+
+    # --- Compute floored start and ceiled end
+    floor_start = start.floor("h").tz_convert("UTC")
+    ceil_end = (
+        end.ceil("h").tz_convert("UTC")
+        if include_end
+        else end.floor("h").tz_convert("UTC")
+    )
+
+    # --- Create target index
+    try:
+        target_index = pd.date_range(floor_start, ceil_end, freq=freq, tz="UTC")
+    except Exception as e:
+        raise ValueError(f"Failed to create target index: {e}")
+
+    # --- Reindex safely
+    try:
+        ts = ts.reindex(target_index)
+    except Exception as e:
+        raise ValueError(f"Reindexing failed: {e}")
+
+    return ts
