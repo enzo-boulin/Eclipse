@@ -1,0 +1,195 @@
+interactions:
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      user-agent:
+      - entsoe-py 0.7.8 (github.com/EnergieID/entsoe-py)
+    method: GET
+    uri: https://web-api.tp.entsoe.eu/api?documentType=A65&processType=A16&outBiddingZone_Domain=10YFR-RTE------C&out_Domain=10YFR-RTE------C&securityToken=FAKE&periodStart=202412310000&periodEnd=202501010000
+  response:
+    body:
+      string: "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<GL_MarketDocument xmlns=\"urn:iec62325.351:tc57wg16:451-6:generationloaddocument:3:0\">\n
+        \   <mRID>6693af6418e5491eb2e06c99b68776bc</mRID>\n    <revisionNumber>1</revisionNumber>\n
+        \   <type>A65</type>\n    <process.processType>A16</process.processType>\n
+        \   <sender_MarketParticipant.mRID codingScheme=\"A01\">10X1001A1001A450</sender_MarketParticipant.mRID>\n
+        \   <sender_MarketParticipant.marketRole.type>A32</sender_MarketParticipant.marketRole.type>\n
+        \   <receiver_MarketParticipant.mRID codingScheme=\"A01\">10X1001A1001A450</receiver_MarketParticipant.mRID>\n
+        \   <receiver_MarketParticipant.marketRole.type>A33</receiver_MarketParticipant.marketRole.type>\n
+        \   <createdDateTime>2025-11-04T15:16:19Z</createdDateTime>\n    <time_Period.timeInterval>\n
+        \       <start>2024-12-31T00:00Z</start>\n        <end>2025-01-01T00:00Z</end>\n
+        \   </time_Period.timeInterval>\n    <TimeSeries>\n        <mRID>1</mRID>\n
+        \       <businessType>A04</businessType>\n        <objectAggregation>A01</objectAggregation>\n
+        \       <outBiddingZone_Domain.mRID codingScheme=\"A01\">10YFR-RTE------C</outBiddingZone_Domain.mRID>\n
+        \       <quantity_Measure_Unit.name>MAW</quantity_Measure_Unit.name>\n        <curveType>A01</curveType>\n
+        \       <Period>\n            <timeInterval>\n                <start>2024-12-31T00:00Z</start>\n
+        \               <end>2025-01-01T00:00Z</end>\n            </timeInterval>\n
+        \           <resolution>PT15M</resolution>\n            <Point>\n                <position>1</position>\n
+        \               <quantity>61705</quantity>\n            </Point>\n            <Point>\n
+        \               <position>2</position>\n                <quantity>61705</quantity>\n
+        \           </Point>\n            <Point>\n                <position>3</position>\n
+        \               <quantity>61705</quantity>\n            </Point>\n            <Point>\n
+        \               <position>4</position>\n                <quantity>61705</quantity>\n
+        \           </Point>\n            <Point>\n                <position>5</position>\n
+        \               <quantity>60431</quantity>\n            </Point>\n            <Point>\n
+        \               <position>6</position>\n                <quantity>60431</quantity>\n
+        \           </Point>\n            <Point>\n                <position>7</position>\n
+        \               <quantity>60431</quantity>\n            </Point>\n            <Point>\n
+        \               <position>8</position>\n                <quantity>60431</quantity>\n
+        \           </Point>\n            <Point>\n                <position>9</position>\n
+        \               <quantity>58513</quantity>\n            </Point>\n            <Point>\n
+        \               <position>10</position>\n                <quantity>58513</quantity>\n
+        \           </Point>\n            <Point>\n                <position>11</position>\n
+        \               <quantity>58513</quantity>\n            </Point>\n            <Point>\n
+        \               <position>12</position>\n                <quantity>58513</quantity>\n
+        \           </Point>\n            <Point>\n                <position>13</position>\n
+        \               <quantity>57611</quantity>\n            </Point>\n            <Point>\n
+        \               <position>14</position>\n                <quantity>57611</quantity>\n
+        \           </Point>\n            <Point>\n                <position>15</position>\n
+        \               <quantity>57611</quantity>\n            </Point>\n            <Point>\n
+        \               <position>16</position>\n                <quantity>57611</quantity>\n
+        \           </Point>\n            <Point>\n                <position>17</position>\n
+        \               <quantity>59018</quantity>\n            </Point>\n            <Point>\n
+        \               <position>18</position>\n                <quantity>59018</quantity>\n
+        \           </Point>\n            <Point>\n                <position>19</position>\n
+        \               <quantity>59018</quantity>\n            </Point>\n            <Point>\n
+        \               <position>20</position>\n                <quantity>59018</quantity>\n
+        \           </Point>\n            <Point>\n                <position>21</position>\n
+        \               <quantity>61929</quantity>\n            </Point>\n            <Point>\n
+        \               <position>22</position>\n                <quantity>61929</quantity>\n
+        \           </Point>\n            <Point>\n                <position>23</position>\n
+        \               <quantity>61929</quantity>\n            </Point>\n            <Point>\n
+        \               <position>24</position>\n                <quantity>61929</quantity>\n
+        \           </Point>\n            <Point>\n                <position>25</position>\n
+        \               <quantity>64919</quantity>\n            </Point>\n            <Point>\n
+        \               <position>26</position>\n                <quantity>64919</quantity>\n
+        \           </Point>\n            <Point>\n                <position>27</position>\n
+        \               <quantity>64919</quantity>\n            </Point>\n            <Point>\n
+        \               <position>28</position>\n                <quantity>64919</quantity>\n
+        \           </Point>\n            <Point>\n                <position>29</position>\n
+        \               <quantity>67517</quantity>\n            </Point>\n            <Point>\n
+        \               <position>30</position>\n                <quantity>67517</quantity>\n
+        \           </Point>\n            <Point>\n                <position>31</position>\n
+        \               <quantity>67517</quantity>\n            </Point>\n            <Point>\n
+        \               <position>32</position>\n                <quantity>67517</quantity>\n
+        \           </Point>\n            <Point>\n                <position>33</position>\n
+        \               <quantity>69284</quantity>\n            </Point>\n            <Point>\n
+        \               <position>34</position>\n                <quantity>69284</quantity>\n
+        \           </Point>\n            <Point>\n                <position>35</position>\n
+        \               <quantity>69284</quantity>\n            </Point>\n            <Point>\n
+        \               <position>36</position>\n                <quantity>69284</quantity>\n
+        \           </Point>\n            <Point>\n                <position>37</position>\n
+        \               <quantity>70363</quantity>\n            </Point>\n            <Point>\n
+        \               <position>38</position>\n                <quantity>70363</quantity>\n
+        \           </Point>\n            <Point>\n                <position>39</position>\n
+        \               <quantity>70363</quantity>\n            </Point>\n            <Point>\n
+        \               <position>40</position>\n                <quantity>70363</quantity>\n
+        \           </Point>\n            <Point>\n                <position>41</position>\n
+        \               <quantity>70375</quantity>\n            </Point>\n            <Point>\n
+        \               <position>42</position>\n                <quantity>70375</quantity>\n
+        \           </Point>\n            <Point>\n                <position>43</position>\n
+        \               <quantity>70375</quantity>\n            </Point>\n            <Point>\n
+        \               <position>44</position>\n                <quantity>70375</quantity>\n
+        \           </Point>\n            <Point>\n                <position>45</position>\n
+        \               <quantity>71483</quantity>\n            </Point>\n            <Point>\n
+        \               <position>46</position>\n                <quantity>71483</quantity>\n
+        \           </Point>\n            <Point>\n                <position>47</position>\n
+        \               <quantity>71483</quantity>\n            </Point>\n            <Point>\n
+        \               <position>48</position>\n                <quantity>71483</quantity>\n
+        \           </Point>\n            <Point>\n                <position>49</position>\n
+        \               <quantity>69942</quantity>\n            </Point>\n            <Point>\n
+        \               <position>50</position>\n                <quantity>69942</quantity>\n
+        \           </Point>\n            <Point>\n                <position>51</position>\n
+        \               <quantity>69942</quantity>\n            </Point>\n            <Point>\n
+        \               <position>52</position>\n                <quantity>69942</quantity>\n
+        \           </Point>\n            <Point>\n                <position>53</position>\n
+        \               <quantity>67517</quantity>\n            </Point>\n            <Point>\n
+        \               <position>54</position>\n                <quantity>67517</quantity>\n
+        \           </Point>\n            <Point>\n                <position>55</position>\n
+        \               <quantity>67517</quantity>\n            </Point>\n            <Point>\n
+        \               <position>56</position>\n                <quantity>67517</quantity>\n
+        \           </Point>\n            <Point>\n                <position>57</position>\n
+        \               <quantity>65788</quantity>\n            </Point>\n            <Point>\n
+        \               <position>58</position>\n                <quantity>65788</quantity>\n
+        \           </Point>\n            <Point>\n                <position>59</position>\n
+        \               <quantity>65788</quantity>\n            </Point>\n            <Point>\n
+        \               <position>60</position>\n                <quantity>65788</quantity>\n
+        \           </Point>\n            <Point>\n                <position>61</position>\n
+        \               <quantity>65118</quantity>\n            </Point>\n            <Point>\n
+        \               <position>62</position>\n                <quantity>65118</quantity>\n
+        \           </Point>\n            <Point>\n                <position>63</position>\n
+        \               <quantity>65118</quantity>\n            </Point>\n            <Point>\n
+        \               <position>64</position>\n                <quantity>65118</quantity>\n
+        \           </Point>\n            <Point>\n                <position>65</position>\n
+        \               <quantity>67561</quantity>\n            </Point>\n            <Point>\n
+        \               <position>66</position>\n                <quantity>67561</quantity>\n
+        \           </Point>\n            <Point>\n                <position>67</position>\n
+        \               <quantity>67561</quantity>\n            </Point>\n            <Point>\n
+        \               <position>68</position>\n                <quantity>67561</quantity>\n
+        \           </Point>\n            <Point>\n                <position>69</position>\n
+        \               <quantity>69339</quantity>\n            </Point>\n            <Point>\n
+        \               <position>70</position>\n                <quantity>69339</quantity>\n
+        \           </Point>\n            <Point>\n                <position>71</position>\n
+        \               <quantity>69339</quantity>\n            </Point>\n            <Point>\n
+        \               <position>72</position>\n                <quantity>69339</quantity>\n
+        \           </Point>\n            <Point>\n                <position>73</position>\n
+        \               <quantity>68220</quantity>\n            </Point>\n            <Point>\n
+        \               <position>74</position>\n                <quantity>68220</quantity>\n
+        \           </Point>\n            <Point>\n                <position>75</position>\n
+        \               <quantity>68220</quantity>\n            </Point>\n            <Point>\n
+        \               <position>76</position>\n                <quantity>68220</quantity>\n
+        \           </Point>\n            <Point>\n                <position>77</position>\n
+        \               <quantity>65265</quantity>\n            </Point>\n            <Point>\n
+        \               <position>78</position>\n                <quantity>65265</quantity>\n
+        \           </Point>\n            <Point>\n                <position>79</position>\n
+        \               <quantity>65265</quantity>\n            </Point>\n            <Point>\n
+        \               <position>80</position>\n                <quantity>65265</quantity>\n
+        \           </Point>\n            <Point>\n                <position>81</position>\n
+        \               <quantity>62886</quantity>\n            </Point>\n            <Point>\n
+        \               <position>82</position>\n                <quantity>62886</quantity>\n
+        \           </Point>\n            <Point>\n                <position>83</position>\n
+        \               <quantity>62886</quantity>\n            </Point>\n            <Point>\n
+        \               <position>84</position>\n                <quantity>62886</quantity>\n
+        \           </Point>\n            <Point>\n                <position>85</position>\n
+        \               <quantity>63984</quantity>\n            </Point>\n            <Point>\n
+        \               <position>86</position>\n                <quantity>63984</quantity>\n
+        \           </Point>\n            <Point>\n                <position>87</position>\n
+        \               <quantity>63984</quantity>\n            </Point>\n            <Point>\n
+        \               <position>88</position>\n                <quantity>63984</quantity>\n
+        \           </Point>\n            <Point>\n                <position>89</position>\n
+        \               <quantity>64603</quantity>\n            </Point>\n            <Point>\n
+        \               <position>90</position>\n                <quantity>64603</quantity>\n
+        \           </Point>\n            <Point>\n                <position>91</position>\n
+        \               <quantity>64603</quantity>\n            </Point>\n            <Point>\n
+        \               <position>92</position>\n                <quantity>64603</quantity>\n
+        \           </Point>\n            <Point>\n                <position>93</position>\n
+        \               <quantity>64521</quantity>\n            </Point>\n            <Point>\n
+        \               <position>94</position>\n                <quantity>63716</quantity>\n
+        \           </Point>\n            <Point>\n                <position>95</position>\n
+        \               <quantity>62503</quantity>\n            </Point>\n            <Point>\n
+        \               <position>96</position>\n                <quantity>61491</quantity>\n
+        \           </Point>\n        </Period>\n    </TimeSeries>\n</GL_MarketDocument>"
+    headers:
+      Connection:
+      - Keep-Alive
+      Content-Type:
+      - text/xml
+      Date:
+      - Tue, 04 Nov 2025 15:16:17 GMT
+      Keep-Alive:
+      - timeout=5, max=100
+      Server:
+      - Apache
+      Strict-Transport-Security:
+      - max-age=31536000 ; includeSubDomains
+      Transfer-Encoding:
+      - chunked
+    status:
+      code: 200
+      message: OK
+version: 1

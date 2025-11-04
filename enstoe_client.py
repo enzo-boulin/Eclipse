@@ -33,11 +33,17 @@ class EntsoeHourlyClient(EntsoePandasClient):
             ts = ts.resample("1h").mean()
         else:
             ts_before = super().query_load(self.code, start=start, end=self.threshold)
-            ts_before = format_ts(ts_before, start=start, end=end, include_start=False)
+            ts_before = format_ts(
+                ts_before, start=start, end=self.threshold, include_start=False
+            )
 
             ts_after = super().query_load(self.code, start=self.threshold, end=end)
             ts_after = format_ts(
-                ts_after, start=start, end=end, include_start=False, freq="15min"
+                ts_after,
+                start=self.threshold,
+                end=end,
+                include_start=False,
+                freq="15min",
             )
             ts_after = ts_after.resample("1h").mean()
 
@@ -45,7 +51,7 @@ class EntsoeHourlyClient(EntsoePandasClient):
             ts = ts[~ts.index.duplicated(keep="last")]
             ts = format_ts(ts, start=start, end=end, include_start=False)
 
-        return ts
+        return ts.rename(columns={"Actual Load": "load"})
 
 
 if __name__ == "__main__":
@@ -53,11 +59,14 @@ if __name__ == "__main__":
 
     client = EntsoeHourlyClient(api_key=ENTSOE_TOKEN)
 
-    start = pd.Timestamp("2025-01-01", tz="Europe/Brussels")
-    end = start + pd.DateOffset(days=1)
+    start = THRESHOLD - pd.DateOffset(hours=3)
+    end = THRESHOLD + pd.DateOffset(hours=3)
 
-    print("Fetching data from", start, "to", end)
+    print("Fetching data from", start.tz_convert("UTC"), "to", end.tz_convert("UTC"))
 
-    ts = client.get_hourly_load(start=start, end=end)
+    ts = (
+        client.get_hourly_load(start=start, end=end)
+        if start < end
+        else client.get_hourly_load(start=end, end=start)
+    )
     print(ts)
-    breakpoint()

@@ -1,0 +1,56 @@
+interactions:
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      user-agent:
+      - entsoe-py 0.7.8 (github.com/EnergieID/entsoe-py)
+    method: GET
+    uri: https://web-api.tp.entsoe.eu/api?documentType=A65&processType=A16&outBiddingZone_Domain=10YFR-RTE------C&out_Domain=10YFR-RTE------C&securityToken=FAKE&periodStart=202412302100&periodEnd=202412310000
+  response:
+    body:
+      string: "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<GL_MarketDocument xmlns=\"urn:iec62325.351:tc57wg16:451-6:generationloaddocument:3:0\">\n
+        \   <mRID>0931e7bdc4fd4d308a0940a889b42208</mRID>\n    <revisionNumber>1</revisionNumber>\n
+        \   <type>A65</type>\n    <process.processType>A16</process.processType>\n
+        \   <sender_MarketParticipant.mRID codingScheme=\"A01\">10X1001A1001A450</sender_MarketParticipant.mRID>\n
+        \   <sender_MarketParticipant.marketRole.type>A32</sender_MarketParticipant.marketRole.type>\n
+        \   <receiver_MarketParticipant.mRID codingScheme=\"A01\">10X1001A1001A450</receiver_MarketParticipant.mRID>\n
+        \   <receiver_MarketParticipant.marketRole.type>A33</receiver_MarketParticipant.marketRole.type>\n
+        \   <createdDateTime>2025-11-04T15:19:23Z</createdDateTime>\n    <time_Period.timeInterval>\n
+        \       <start>2024-12-30T21:00Z</start>\n        <end>2024-12-31T00:00Z</end>\n
+        \   </time_Period.timeInterval>\n    <TimeSeries>\n        <mRID>1</mRID>\n
+        \       <businessType>A04</businessType>\n        <objectAggregation>A01</objectAggregation>\n
+        \       <outBiddingZone_Domain.mRID codingScheme=\"A01\">10YFR-RTE------C</outBiddingZone_Domain.mRID>\n
+        \       <quantity_Measure_Unit.name>MAW</quantity_Measure_Unit.name>\n        <curveType>A01</curveType>\n
+        \       <Period>\n            <timeInterval>\n                <start>2024-12-30T21:00Z</start>\n
+        \               <end>2024-12-31T00:00Z</end>\n            </timeInterval>\n
+        \           <resolution>PT60M</resolution>\n            <Point>\n                <position>1</position>\n
+        \               <quantity>66599</quantity>\n            </Point>\n            <Point>\n
+        \               <position>2</position>\n                <quantity>66176</quantity>\n
+        \           </Point>\n            <Point>\n                <position>3</position>\n
+        \               <quantity>63815</quantity>\n            </Point>\n        </Period>\n
+        \   </TimeSeries>\n</GL_MarketDocument>"
+    headers:
+      Connection:
+      - Keep-Alive
+      Content-Type:
+      - text/xml
+      Date:
+      - Tue, 04 Nov 2025 15:19:23 GMT
+      Keep-Alive:
+      - timeout=5, max=100
+      Server:
+      - Apache
+      Strict-Transport-Security:
+      - max-age=31536000 ; includeSubDomains
+      Transfer-Encoding:
+      - chunked
+    status:
+      code: 200
+      message: OK
+version: 1
