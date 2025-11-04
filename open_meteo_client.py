@@ -4,6 +4,7 @@ import pandas as pd
 import requests
 
 from config import CITIES_CFG, OPEN_METEO_BASE_URL, TZ
+from utils import format_ts
 
 
 class OpenMeteoClient:
@@ -40,31 +41,39 @@ class OpenMeteoClient:
         lon: float,
         start: pd.Timestamp,
         end: pd.Timestamp,
-    ) -> pd.DataFrame:
-        """Fetch hourly temperature for a single city."""
-        start_str = start.strftime("%Y-%m-%d")
-        end_str = end.strftime("%Y-%m-%d")
+    ) -> pd.Series:
+        """Fetch hourly temperature for a single city as a time-indexed Series in CET."""
+        # raise if start or end are not localized
+        if start.tzinfo is None or end.tzinfo is None:
+            raise ValueError("start and end timestamps must be timezone-aware")
+        start_str = start.tz_convert("UTC").strftime("%Y-%m-%d")
+        end_str = end.tz_convert("UTC").strftime("%Y-%m-%d")
 
         url = (
             f"{self.base_url}?latitude={lat}&longitude={lon}"
             f"&start_date={start_str}&end_date={end_str}"
             "&hourly=temperature_2m"
-            f"&timezone={self.timezone}"
+            f"&timezone=UTC"
         )
-        breakpoint()
+
         response = requests.get(url)
         response.raise_for_status()
         data = response.json()
-
         df = pd.DataFrame(
             {
                 "datetime": pd.to_datetime(data["hourly"]["time"]),
                 city_name: data["hourly"]["temperature_2m"],
             }
         )
-        return df
+        df = df.set_index("datetime")
+        # Returns in the desired timezone (from the url)
+        df.index = df.index.tz_localize("UTC")
+        ts = format_ts(df.squeeze(), start=start, end=end, include_start=False)
+        if ts.index[-1] == end.tz_convert("UTC").floor("h"):
+            ts = ts[:-1]
+        return ts
 
-    def get_averaged(self, start: pd.Timestamp, end: pd.Timestamp) -> pd.DataFrame:
+    def get_averaged(self, start: pd.Timestamp, end: pd.Timestamp) -> pd.Series:
         """
         Fetch hourly temperature for all configured cities
         and compute the population-weighted national average.
@@ -74,40 +83,21 @@ class OpenMeteoClient:
         pd.DataFrame
             Columns: datetime, temp_<city>, temp_FR
         """
-        temp_dfs: list[pd.DataFrame] = []
+        tss = []
         for name, info in self.cities_cfg.items():
-            df_city: pd.DataFrame = self.get_city(
+            ts = info["weight"] * self.get_city(
                 name, info["lat"], info["lon"], start, end
             )
-            df_city.rename(columns={name: f"temp_{name}"}, inplace=True)
-            temp_dfs.append(df_city)
+            tss.append(ts)
+        mean_ts = pd.concat(tss, axis=1).sum(axis=1, skipna=True)
 
-        # Merge all cities on datetime
-        df_all: pd.DataFrame = temp_dfs[0]
-        for df_city in temp_dfs[1:]:
-            df_all = pd.merge(df_all, df_city, on="datetime", how="inner")
-
-        # Compute weighted mean
-        total_weight: float = sum(city["weight"] for city in self.cities.values())
-        df_all["temp_FR"] = (
-            sum(
-                df_all[f"temp_{city}"] * info["weight"]
-                for city, info in self.cities.items()
-            )
-            / total_weight
-        )
-
-        return df_all
+        return mean_ts.rename("temp").round(2)
 
 
-# -------------------------------------------------------
-# Example usage
-# -------------------------------------------------------
 if __name__ == "__main__":
     client = OpenMeteoClient()
-    end = pd.Timestamp.now(tz="Europe/Paris") - pd.DateOffset(days=1)
-    start = end - pd.DateOffset(days=60)
-
-    df_temp = client.get_averaged(start, end)
-    print(df_temp.head())
-    print(df_temp.columns)
+    start = pd.Timestamp("2025-08-04", tz="CET")
+    end = start + pd.DateOffset(hours=2)
+    print("Fetching data from", start, "to", end)
+    ts = client.get_averaged(start, end)
+    print(ts.tz_convert("CET"))
