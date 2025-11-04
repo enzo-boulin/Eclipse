@@ -7,6 +7,7 @@ def format_ts(
     end: pd.Timestamp,
     ts_tz: str | None = None,
     freq: str = "1h",
+    include_start: bool = True,
     include_end: bool = False,
 ) -> pd.Series:
     """
@@ -42,14 +43,12 @@ def format_ts(
         If reindexing fails.
     """
 
-    # --- Validate timezone awareness
     if start.tzinfo is None or end.tzinfo is None:
         raise ValueError("Both `start` and `end` must be timezone-aware Timestamps.")
 
     if not isinstance(ts.index, pd.DatetimeIndex):
         raise ValueError("`ts` must have a DatetimeIndex.")
 
-    # --- Handle timezone of ts
     idx = ts.index
     if idx.tz is None:
         if ts_tz is None:
@@ -58,24 +57,18 @@ def format_ts(
     ts = ts.copy()
     ts.index = idx
 
-    # --- Convert to UTC
     ts = ts.tz_convert("UTC")
 
-    # --- Compute floored start and ceiled end
-    floor_start = start.floor("h").tz_convert("UTC")
-    ceil_end = (
-        end.ceil("h").tz_convert("UTC")
-        if include_end
-        else end.floor("h").tz_convert("UTC")
+    cut_start = (start.floor("h") if include_start else start.ceil("h")).tz_convert(
+        "UTC"
     )
+    cut_end = (end.ceil("h") if include_end else end.floor("h")).tz_convert("UTC")
 
-    # --- Create target index
     try:
-        target_index = pd.date_range(floor_start, ceil_end, freq=freq, tz="UTC")
+        target_index = pd.date_range(cut_start, cut_end, freq=freq, tz="UTC")
     except Exception as e:
         raise ValueError(f"Failed to create target index: {e}")
 
-    # --- Reindex safely
     try:
         ts = ts.reindex(target_index)
     except Exception as e:
