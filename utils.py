@@ -9,6 +9,7 @@ def format_ts(
     freq: str = "1h",
     include_start: bool = True,
     include_end: bool = False,
+    include_equal_end: bool = False,
 ) -> pd.Series:
     """
     Format a timeseries to have:
@@ -29,6 +30,12 @@ def format_ts(
         Timezone of ts if its index is tz-naive. Required if index is tz-naive.
     freq : str, optional
         Frequency for reindexing (default "1h").
+    include_start : bool, optional
+        Whether to include the start timestamp (default True).
+    include_end : bool, optional
+        Whether to include the end timestamp (default False).
+    include_equal_end : bool, optional
+        If True, include end even if ts.index[-1] == end - pd.Timedelta(freq) (default False).
 
     Returns
     -------
@@ -63,6 +70,9 @@ def format_ts(
         "UTC"
     )
     cut_end = (end.ceil("h") if include_end else end.floor("h")).tz_convert("UTC")
+    # If the end should not be included in case of equality, we adjust cut_end
+    if not include_equal_end and ts.index[-1] + pd.Timedelta(freq) == end:
+        cut_end = cut_end - pd.Timedelta(freq)
 
     try:
         target_index = pd.date_range(cut_start, cut_end, freq=freq, tz="UTC")
