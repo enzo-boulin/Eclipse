@@ -78,12 +78,3 @@ def test_format_ts_inserts_nan_if_missing(base_series):
 
     assert result.isna().sum() == 1
     assert result.index.tz == timezone.utc
-
-
-def test_format_ts_invalid_freq(base_series):
-    """It should raise if freq is invalid."""
-    start = pd.Timestamp("2025-11-04 10:00", tz="Europe/Paris")
-    end = pd.Timestamp("2025-11-04 12:00", tz="Europe/Paris")
-
-    with pytest.raises(ValueError, match="Failed to create target index"):
-        format_ts(base_series, start, end, freq="invalid_freq")

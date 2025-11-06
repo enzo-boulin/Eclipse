@@ -64,3 +64,4 @@ pytest_cache/
 *.tmp
 *.temp
 *.bak
+play_with_entsoe.ipynb

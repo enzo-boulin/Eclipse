@@ -4,7 +4,7 @@ from entsoe import EntsoePandasClient
 from utils import format_ts
 
 # from this date EntsoePandasClient sends 15 min load data
-THRESHOLD = pd.Timestamp("2024-12-31 01:00:00+01:00")
+THRESHOLD = pd.Timestamp("2024-12-31 00:00:00", tz="UTC")
 COUNTRY_CODE = "FR"
 ONE_HOUR = pd.Timedelta("1h")
 FIFTEEN_MINUTES = pd.Timedelta("15min")
@@ -19,9 +19,13 @@ class EntsoeHourlyClient(EntsoePandasClient):
     threshold = THRESHOLD
     code = COUNTRY_CODE
 
-    def get_hourly_load(self, start: pd.Timestamp, end: pd.Timestamp):
+    def get_hourly_load(self, start: pd.Timestamp, end: pd.Timestamp) -> pd.Series:
         if start.tzinfo is None or end.tzinfo is None:
             raise ValueError("start and end timestamps must be timezone-aware")
+
+        # Ensure start and end are in the same timezone (UTC)
+        start = start.tz_convert("UTC")
+        end = end.tz_convert("UTC")
 
         if end <= self.threshold:
             ts = super().query_load(self.code, start=start, end=end)

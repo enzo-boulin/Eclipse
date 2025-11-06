@@ -46,12 +46,14 @@ class OpenMeteoClient:
         # raise if start or end are not localized
         if start.tzinfo is None or end.tzinfo is None:
             raise ValueError("start and end timestamps must be timezone-aware")
-        start_str = start.tz_convert("UTC").strftime("%Y-%m-%d")
-        end_str = end.tz_convert("UTC").strftime("%Y-%m-%d")
+
+        # Ensure start and end are in the same timezone (UTC)
+        start = start.tz_convert("UTC")
+        end = end.tz_convert("UTC")
 
         url = (
             f"{self.base_url}?latitude={lat}&longitude={lon}"
-            f"&start_date={start_str}&end_date={end_str}"
+            f"&start_date={start.strftime('%Y-%m-%d')}&end_date={end.strftime('%Y-%m-%d')}"
             "&hourly=temperature_2m"
             f"&timezone=UTC"
         )
@@ -69,7 +71,7 @@ class OpenMeteoClient:
         # Returns in the desired timezone (from the url)
         df.index = df.index.tz_localize("UTC")
         ts = format_ts(df.squeeze(), start=start, end=end, include_start=False)
-        if ts.index[-1] == end.tz_convert("UTC").floor("h"):
+        if ts.index[-1] == end.floor("h"):
             ts = ts[:-1]
         return ts
 
@@ -77,6 +79,9 @@ class OpenMeteoClient:
         """
         Fetch hourly temperature for all configured cities
         and compute the population-weighted national average.
+
+        NB: Although the population of a city in not fixed through time,
+        we take the current one, no matter start,end
 
         Returns
         -------
