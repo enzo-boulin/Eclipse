@@ -10,6 +10,7 @@ def index_to_time_features(index: pd.DatetimeIndex) -> pd.DataFrame:
     day = index.day
     month = index.month
     day_of_week = index.dayofweek
+    hour = index.hour
     features = pd.DataFrame(
         {
             "day_sin": np.sin(2 * np.pi * day / 31),
@@ -19,6 +20,8 @@ def index_to_time_features(index: pd.DatetimeIndex) -> pd.DataFrame:
             "dow_sin": np.sin(2 * np.pi * day_of_week / 7),
             "dow_cos": np.cos(2 * np.pi * day_of_week / 7),
             "is_weekend": (day_of_week >= 5).astype(int),
+            "hour_sin": np.sin(2 * np.pi * hour / 24),
+            "hour_cos": np.cos(2 * np.pi * hour / 24),
         },
         index=index,
     )
