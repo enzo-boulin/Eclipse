@@ -68,3 +68,5 @@ play_with_entsoe.ipynb
 backup.csv
 requirements.txt
 token/
+last_week.csv
+tests/cassettes/test_realised_consumption_one_day.yaml
