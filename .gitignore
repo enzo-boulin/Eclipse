@@ -67,3 +67,4 @@ pytest_cache/
 play_with_entsoe.ipynb
 backup.csv
 requirements.txt
+token/
